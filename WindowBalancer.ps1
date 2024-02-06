@@ -31,7 +31,12 @@ param (
         Mandatory=$True,
         ValueFromPipeline=$False,
         ValueFromPipelineByPropertyName=$False)]
-    [string] $ProcessName
+    [string] $ProcessName,
+    [parameter(
+        Mandatory=$False,
+        ValueFromPipeline=$False,
+        ValueFromPipelineByPropertyName=$False)]
+    [switch] $FullScreen = $False
 )
 
 Import-Module .\Set-Window.psm1
@@ -58,12 +63,20 @@ foreach($Process in $RunningProcesses)
         if ($Count -lt $AllScreens.Count)
         {
             $Screen = $AllScreens[$Count]
-            $Height = $Screen.WorkingArea.Height
-            $Width = $Screen.WorkingArea.Width
             $X = $Screen.WorkingArea.x
             $Y = $Screen.WorkingArea.Y
 
-            Set-Window -Id $Process.Id -X $X -Y $Y -Width $Width -Height $Height
+            if ($FullScreen)
+            {
+                $Height = $Screen.WorkingArea.Height
+                $Width = $Screen.WorkingArea.Width
+                Set-Window -Id $Process.Id -X $X -Y $Y -Width $Width -Height $Height
+            }
+            else
+            {
+                Set-Window -Id $Process.Id -X $X -Y $Y
+            }
+
             $Count++
         }
         else
